@@ -1,0 +1,29 @@
+.headercontainer {
+  width: 100%;
+  height: 5rem;
+  background-color: #264653;
+  display: flex;
+  flex-direction: row;
+  justify-content: space-between;
+  align-items: center;
+
+  .headerbutton{
+    width: 5rem;
+    height: 5rem;
+    background-color: #2A9D8F;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding: 0px;
+  }
+
+  .headerbutton:hover {
+    background-color: #E9C46A;
+  }
+
+  .headericon{
+    width: 70%;
+    height: 70%;
+    color: #264653;
+  }
+}

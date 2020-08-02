@@ -1,0 +1,67 @@
+.trackerband {
+    background-color: #2a9d8f;
+    padding: 1rem;
+    display: flex;
+    flex: 1;
+    align-items: center;
+    justify-content: center;
+}
+
+.trackericon {
+    width: 2rem !important;
+    height: 2rem !important;
+    color: #264653;
+}
+
+.trackerinput {
+    padding: 0.5rem;
+    display: block;
+    border: none;
+    border-radius: 0.5rem;
+    font-family: Sora;
+    font-weight: 300;
+    background-color: white;
+}
+
+.ticketinput {
+    width: 10%;
+    max-width: 10rem;
+}
+
+.trackerinput:focus {
+    outline: none;
+}
+
+.labelinput {
+    width: 15%;
+}
+
+.tagselect {
+    width: 10%;
+}
+
+.trackercard {
+    width: fit-content;
+    max-width: 60rem;
+    padding: 1rem;
+    justify-content: center;
+    background-color: #F4A261;
+    display: flex;
+    flex: 1;
+    margin-left: auto;
+    margin-right: auto;
+    margin-bottom: 2rem;
+    border-radius: 1rem;
+    align-items: center;
+}
+
+.cardcontainer {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    padding-top: 2rem;
+    padding-bottom: 2rem;
+    overflow: auto;
+    max-height: 10%;
+}
