@@ -17,5 +17,9 @@ export function FormatDuration(duration: Duration){
       seconds = Math.round(60 * (minutes - Math.floor(minutes)));
     }
 
+    if (hours >= 1){
+      minutes = Math.round(60 * (hours - Math.floor(hours)))
+    }
+
     return `${Math.floor(hours)}h ${Math.floor(minutes)}m ${seconds}s`;
 }
