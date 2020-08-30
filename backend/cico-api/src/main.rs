@@ -76,7 +76,7 @@ fn get_users(conn:DbConn) -> Json<Vec<FetchUser>> {
 fn main() {
     rocket::ignite()
     .attach(DbConn::fairing())
-    .mount("/hello", routes![hello])
-    .mount("/users", routes![get_users, create_user])
+    .mount("api/hello", routes![hello])
+    .mount("api/users", routes![get_users, create_user])
     .launch();
 }
