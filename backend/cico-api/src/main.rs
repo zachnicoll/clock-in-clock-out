@@ -15,7 +15,7 @@ use rocket_contrib::databases::{database, diesel::PgConnection};
 use diesel::{Insertable, Queryable, QueryDsl, select};
 use diesel::prelude::*;
 use bcrypt::{DEFAULT_COST, hash, verify};
-
+use std::io::{self, Write};
 
 #[database("postgres")]
 struct DbConn(PgConnection);
@@ -26,13 +26,18 @@ struct FetchUser {
     email: String,
 }
 
-#[derive(Insertable, Deserialize)]
+#[derive(Insertable, Queryable, Deserialize)]
 #[table_name="users"]
 struct PostUser {
     email: String,
     password: String
 }
 
+#[derive(Serialize)]
+struct Response {
+    status: String,
+    message: String
+}
 
 #[get("/")]
 fn hello() -> &'static str {
@@ -62,6 +67,38 @@ fn create_user(conn:DbConn, new_user:Json<PostUser>) -> Json<FetchUser> {
     Json(secure_result)
 }
 
+#[post("/login", format="json", data="<credentials>")]
+fn login(conn:DbConn, credentials:Json<PostUser>) -> Json<Response> {
+    let user = users::table
+    .filter(users::email.eq(&credentials.email))
+    .select((users::email, users::password))
+    .first::<PostUser>(&*conn);
+
+    let mut status = "400";
+    let mut message = "Incorrect credentials";
+
+    let user = match user{
+        Ok(user) => user,
+        Err(error) => PostUser {email:"".to_string(), password:"".to_string()}
+    };
+
+    if user.email != "" {
+        let verified : bool = verify(&credentials.password, &user.password).unwrap();
+    
+        if verified {
+            message = "User authenticated";
+            status = "200";
+        }
+    }
+
+    let response = Response {
+        status: String::from(status),
+        message: String::from(message)
+    };
+
+    Json(response)
+}
+
 #[get("/")]
 fn get_users(conn:DbConn) -> Json<Vec<FetchUser>> {
     let users = users::table
@@ -77,6 +114,6 @@ fn main() {
     rocket::ignite()
     .attach(DbConn::fairing())
     .mount("/api/hello", routes![hello])
-    .mount("/api/users", routes![get_users, create_user])
+    .mount("/api/users", routes![get_users, create_user, login])
     .launch();
 }

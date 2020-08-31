@@ -1,5 +1,6 @@
 [development]
 port = 3000
+log = "debug"
 
 [development.databases]
 postgres = {url = "postgres://zachn:zachn@localhost/cico"}

@@ -12,6 +12,7 @@ serde = "1.0.115"
 diesel = { version = "1.4.4", features = ["postgres"] }
 dotenv = "0.15.0"
 bcrypt = "0.8"
+log = "0.4"
 
 
 [dependencies.serde_derive]
