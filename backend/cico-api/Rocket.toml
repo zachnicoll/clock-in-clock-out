@@ -2,11 +2,5 @@
 port = 3000
 log = "debug"
 
-[development.databases]
-postgres = {url = "postgres://zachn:zachn@localhost/cico"}
-
 [production]
 port = 3000
-
-[production.databases]
-postgres = {url = "postgres://zachn:zachn@localhost/cico"}

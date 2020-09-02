@@ -11,149 +11,78 @@ extern crate serde_derive;
 extern crate serde;
 extern crate serde_json;
 
-use serde_derive::{Deserialize, Serialize};
+extern crate dotenv;
+use dotenv::dotenv;
+#[macro_use]
+extern crate dotenv_codegen;
 
-mod schema;
+use diesel::PgConnection;
+use diesel::r2d2::{ConnectionManager, Pool, PooledConnection};
 
-use rocket::http::ContentType;
+use std::ops::Deref;
 use rocket::http::Status;
-use rocket::request::Request;
-use rocket::response;
-use rocket::response::{Responder, Response};
-use rocket_contrib::databases::{database, diesel::PgConnection};
-use rocket_contrib::json::{Json, JsonValue};
+use rocket::request::{self, FromRequest};
+use rocket::{Request, State, Outcome};
 
-use crate::schema::users;
-use bcrypt::{hash, verify, DEFAULT_COST};
-use diesel::prelude::*;
-use diesel::{Insertable, QueryDsl, Queryable};
+// An alias to the type for a pool of Diesel Pg connections.
+type PgPool = Pool<ConnectionManager<PgConnection>>;
 
-#[database("postgres")]
-struct DbConn(PgConnection);
+// The URL to the database, set via the `DATABASE_URL` environment variable.
+static DATABASE_URL: &'static str = dotenv!("DATABASE_URL");
 
-#[derive(Queryable, Serialize)]
-struct FetchUser {
-    id: i32,
-    email: String,
+/// Initializes a database pool.
+fn init_pool() -> PgPool {
+    let manager = ConnectionManager::<PgConnection>::new(DATABASE_URL);
+    Pool::new(manager).expect("db pool")
 }
 
-#[derive(Insertable, Queryable, Deserialize)]
-#[table_name = "users"]
-struct PostUser {
-    email: String,
-    password: String,
-}
+// Connection request guard type: a wrapper around an r2d2 pooled connection.
+pub struct DbConn(pub PooledConnection<ConnectionManager<PgConnection>>);
 
-#[derive(Debug)]
-struct ApiResponse {
-    json: JsonValue,
-    status: Status,
-}
+/// Attempts to retrieve a single connection from the managed database pool. If
+/// no pool is currently managed, fails with an `InternalServerError` status. If
+/// no connections are available, fails with a `ServiceUnavailable` status.
+impl<'a, 'r> FromRequest<'a, 'r> for DbConn {
+    type Error = ();
 
-impl<'r> Responder<'r> for ApiResponse {
-    fn respond_to(self, req: &Request) -> response::Result<'r> {
-        Response::build_from(self.json.respond_to(&req).unwrap())
-            .status(self.status)
-            .header(ContentType::JSON)
-            .ok()
+    fn from_request(request: &'a Request<'r>) -> request::Outcome<Self, Self::Error> {
+        let pool = request.guard::<State<PgPool>>()?;
+        match pool.get() {
+            Ok(conn) => Outcome::Success(DbConn(conn)),
+            Err(_) => Outcome::Failure((Status::ServiceUnavailable, ()))
+        }
     }
 }
 
+// For the convenience of using an &DbConn as an &PgConnection.
+impl Deref for DbConn {
+    type Target = PgConnection;
+
+    fn deref(&self) -> &Self::Target {
+        &self.0
+    }
+}
+
+mod schema;
+#[path = "./Models/helpers.rs"]
+mod helpers;
+#[path = "./Routes/api_users.rs"]
+mod api_users;
+
+use api_users::*;
+
+// Using this endpoint as the "check" to see if the server is running
 #[get("/")]
 fn hello() -> &'static str {
     "Hello, world!"
 }
 
-#[post("/", format = "json", data = "<new_user>")]
-fn create_user(conn: DbConn, new_user: Json<PostUser>) -> ApiResponse {
-    let hashed_password = hash(new_user.0.password, DEFAULT_COST);
-
-    return match hashed_password {
-        Ok(hash) => {
-            let user = PostUser {
-                email: new_user.0.email,
-                password: hash,
-            };
-
-            let result = diesel::insert_into(users::table)
-                .values(user)
-                .returning((users::id, users::email))
-                .get_result::<FetchUser>(&*conn);
-            return match result {
-                Ok(result) => ApiResponse {
-                    json: json!({ "user": result }),
-                    status: Status::Ok,
-                },
-                Err(_) => ApiResponse {
-                    json: json!({"error":"Failed to create user.", "message":"Email already exists!"}),
-                    status: Status::BadRequest,
-                },
-            };
-        }
-        Err(_) => ApiResponse {
-            json: json!({"error":"Failed to create user.", "message":"Could not process credentials."}),
-            status: Status::BadRequest,
-        },
-    };
-}
-
-#[post("/login", format = "json", data = "<credentials>")]
-fn login(conn: DbConn, credentials: Json<PostUser>) -> ApiResponse {
-    let user = users::table
-        .filter(users::email.eq(&credentials.email))
-        .select((users::email, users::password))
-        .first::<PostUser>(&*conn);
-
-    return match user {
-        Ok(user) => match verify(&credentials.password, &user.password) {
-            Ok(verified) => {
-                if verified {
-                    ApiResponse {
-                        json: json!({"message" : "User authenticated."}),
-                        status: Status::Ok,
-                    }
-                } else {
-                    ApiResponse {
-                        json: json!({"error":"Unauthorized user.","message" : "Incorrect credentials."}),
-                        status: Status::Unauthorized,
-                    }
-                }
-            }
-            Err(_) => ApiResponse {
-                json: json!({"error":"Could not authenticate user.","message" : "Something went wrong verifying the credentials."}),
-                status: Status::BadRequest,
-            },
-        },
-        Err(_) => ApiResponse {
-            json: json!({"error":"Unauthorized user.","message" : "Incorrect credentials."}),
-            status: Status::Unauthorized,
-        },
-    };
-}
-
-#[get("/")]
-fn get_users(conn: DbConn) -> ApiResponse {
-    let users = users::table
-        .select((users::id, users::email))
-        .order(users::columns::id.desc())
-        .load::<FetchUser>(&*conn);
-
-    return match users {
-        Ok(users) => ApiResponse {
-            json: json!({ "users": users }),
-            status: Status::Ok,
-        },
-        Err(_) => ApiResponse {
-            json: json!({"error":"Could not fetch users!"}),
-            status: Status::BadRequest,
-        },
-    };
-}
-
 fn main() {
+    dotenv().ok();
+
     rocket::ignite()
-        .attach(DbConn::fairing())
         .mount("/api/hello", routes![hello])
-        .mount("/api/users", routes![get_users, create_user, login])
+        .mount("/api/users", routes![get_user, create_user, login])
+        .manage(init_pool())
         .launch();
 }
