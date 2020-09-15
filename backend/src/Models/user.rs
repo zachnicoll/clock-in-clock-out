@@ -16,7 +16,7 @@ pub struct PostUser {
 #[derive(Insertable, Queryable, Deserialize)]
 #[table_name = "users"]
 pub struct User {
+    pub id: Uuid,
     pub email: String,
     pub password: String,
-    pub id: Uuid,
 }

@@ -1,6 +1,5 @@
 [development]
 port = 3000
-log = "debug"
 
 [production]
 port = 3000

@@ -1,13 +1,12 @@
 use rocket_contrib::json::{JsonValue};
-use rocket::http::Status;
-use rocket::http::ContentType;
-use rocket::request::Request;
+use rocket::Data;
+use rocket::request::{Request,FromParam};
 use rocket::response;
 use rocket::response::{Responder, Response};
-use rocket::request::FromParam;
-use rocket::http::RawStr;
-
+use rocket::http::{Method, ContentType, Status, RawStr};
+use rocket::fairing::{Fairing, Info, Kind};
 use uuid::Uuid;
+
 
 // Claim struct for JWT token creation
 #[derive(Debug, Serialize, Deserialize)]

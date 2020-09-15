@@ -98,8 +98,8 @@ pub fn create_user(conn: DbConn, new_user: Json<PostUser>) -> ApiResponse {
 pub fn login(conn: DbConn, credentials: Json<PostUser>) -> ApiResponse {
     let user = users::table
         .filter(users::email.eq(&credentials.email))
-        .select((users::email, users::password))
-        .first::<PostUser>(&*conn);
+        .select((users::id, users::email, users::password))
+        .first::<User>(&*conn);
 
     return match user {
         Ok(user) => match verify(&credentials.password, &user.password) {
@@ -112,11 +112,16 @@ pub fn login(conn: DbConn, credentials: Json<PostUser>) -> ApiResponse {
                         exp: expiry.timestamp()
                     };
                     let token = encode(&Header::default(), &claim, &EncodingKey::from_secret("secret".as_ref()));
+                    let user_info = FetchUser {
+                        id: user.id,
+                        email: user.email
+                    };
 
                     ApiResponse {
                         json: json!({
                             "message" : "User authenticated.",
-                            "token" : token.unwrap()
+                            "token" : token.unwrap(),
+                            "user": user_info
                         }),
                         status: Status::Ok,
                     }
