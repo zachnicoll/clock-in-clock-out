@@ -13,7 +13,7 @@ use user::{PostUser, FetchUser, User};
 use bcrypt::{hash, verify, DEFAULT_COST};
 use diesel::prelude::*;
 use chrono::{Utc, Duration};
-use jsonwebtoken::{encode, decode, Header, Algorithm, Validation, EncodingKey, DecodingKey};
+use jsonwebtoken::{encode,  Header, EncodingKey};
 
 use uuid::Uuid;
 

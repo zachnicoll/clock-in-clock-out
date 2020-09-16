@@ -1,10 +1,8 @@
 use rocket_contrib::json::{JsonValue};
-use rocket::Data;
 use rocket::request::{Request,FromParam};
 use rocket::response;
 use rocket::response::{Responder, Response};
-use rocket::http::{Method, ContentType, Status, RawStr};
-use rocket::fairing::{Fairing, Info, Kind};
+use rocket::http::{ContentType, Status, RawStr};
 use uuid::Uuid;
 
 

@@ -22,9 +22,7 @@ use diesel::r2d2::{ConnectionManager, Pool, PooledConnection};
 use std::ops::Deref;
 use rocket::http::Status;
 use rocket::request::{self, FromRequest};
-use rocket::{Request, State, Outcome, Data};
-use rocket::data::DataStream;
-use rocket::fairing::AdHoc;
+use rocket::{Request, State, Outcome};
 
 // An alias to the type for a pool of Diesel Pg connections.
 type PgPool = Pool<ConnectionManager<PgConnection>>;
