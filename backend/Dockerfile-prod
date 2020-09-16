@@ -6,8 +6,6 @@ COPY . /usr/src/app
 
 WORKDIR /usr/src/app
 
-RUN cargo install diesel_cli --no-default-features --features postgres
-
 RUN cargo build --release
 
 RUN mkdir /backend

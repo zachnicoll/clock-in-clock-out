@@ -41,9 +41,8 @@ services:
         depends_on: 
             - postgres-prod
         env_file: docker.env
-        command: bash -c "diesel setup && /cico-api"
+        command: bash -c "/cico-api"
         restart: always
-    
     
 
 volumes:
