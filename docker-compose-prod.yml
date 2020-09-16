@@ -1,6 +1,6 @@
 version: "3.1"
 services:
-    postgres:
+    postgres-prod:
         container_name: postgres
         image: postgres:11-alpine
         restart: always
@@ -12,36 +12,39 @@ services:
         volumes:
             - "/var/run/postgres/postgres.sock:/var/run/postgres/postgres.sock"
             - dbdata:/var/lib/postgresql/data
-    
-    web:
+            
+    web-prod:
         container_name: web
-        build: ./frontend
+        build:
+            context: ./frontend
+            dockerfile: Dockerfile-prod
         volumes:
             - ./frontend:/usr/src/app
         ports:
-            - "3000:3000"
-        command: bash -c "yarn && yarn start"
+            - "80:80"
+            - "443:443"
         links:
-            - api
+            - api-prod
         restart: always
-        stdin_open: true
 
-    api:
+    api-prod:
         container_name: api
-        build: ./backend
+        build:
+            context: ./backend
+            dockerfile: Dockerfile-prod
         ports:
             - "8000:8000"
         volumes:
             - ./backend:/usr/src/app
         links:
-            - postgres
+            - postgres-prod
         depends_on: 
-            - postgres
+            - postgres-prod
         env_file: docker.env
-        command: bash -c "diesel setup && cargo watch -x run"
+        command: bash -c "/cico-api"
         restart: always
     
-
+    
 
 volumes:
     dbdata:

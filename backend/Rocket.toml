@@ -1,5 +1,5 @@
-[development]
-port = 3000
+[global]
+address = "0.0.0.0"
 
-[production]
-port = 3000
+[development]
+address = "0.0.0.0"
