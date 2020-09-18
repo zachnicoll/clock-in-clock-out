@@ -1,5 +1,6 @@
 use crate::schema::users;
 use uuid::Uuid;
+use crate::helpers::Usergroup;
 
 #[derive(Queryable, Serialize)]
 pub struct FetchUser {
@@ -13,10 +14,11 @@ pub struct PostUser {
     pub password: String,
 }
 
-#[derive(Insertable, Queryable, Deserialize)]
+#[derive(Debug, Insertable, Queryable, Deserialize)]
 #[table_name = "users"]
 pub struct User {
     pub id: Uuid,
     pub email: String,
     pub password: String,
+    pub user_group: Usergroup
 }
