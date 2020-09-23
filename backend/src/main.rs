@@ -59,13 +59,18 @@ impl Deref for DbConn {
     }
 }
 
-mod schema;
-#[path = "./Models/helpers.rs"]
-mod helpers;
+mod db_schema;
+#[path = "./Helpers/misc_helpers.rs"]
+mod misc_helpers;
+#[path = "./Helpers/jwt_helpers.rs"]
+mod jwt_helpers;
 #[path = "./Routes/api_users.rs"]
 mod api_users;
+#[path = "./Routes/api_tasks.rs"]
+mod api_tasks;
 
 use api_users::*;
+use api_tasks::*;
 
 // Using this endpoint as the "check" to see if the server is running
 #[get("/")]
@@ -79,6 +84,7 @@ fn main() {
     rocket::ignite()
         .mount("/api/hello", routes![hello])
         .mount("/api/users", routes![get_user, create_user, login])
+        .mount("/api/tasks", routes![create_task, get_task, get_task_date])
         .manage(init_pool())
         .launch();
 }

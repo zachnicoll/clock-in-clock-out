@@ -1,13 +1,12 @@
 #[path = "../Models/user.rs"]
 mod user;
-#[path = "../Models/helpers.rs"]
-mod helpers;
 
 use rocket_contrib::json::Json;
 use rocket::http::Status;
 use crate::DbConn;
-use crate::helpers::*;
-use crate::schema::users;
+use crate::misc_helpers::*;
+use crate::jwt_helpers::*;
+use crate::db_schema::users;
 use user::{PostUser, FetchUser, User};
 use bcrypt::{hash, verify, DEFAULT_COST};
 use diesel::prelude::*;
@@ -26,7 +25,6 @@ pub fn get_user(conn: DbConn, _jwt: JWT, id: UuidParam) -> ApiResponse {
     let user = users::table
         .filter(users::id.eq(id.uuid))
         .select((users::id, users::email))
-        .order(users::columns::id.desc())
         .first::<FetchUser>(&*conn);
 
     return match user {
@@ -126,7 +124,6 @@ pub fn login(conn: DbConn, credentials: Json<PostUser>) -> ApiResponse {
 
                     ApiResponse {
                         json: json!({
-                            "message" : "User authenticated.",
                             "token" : token.unwrap(),
                             "user" : user_info
                         }),

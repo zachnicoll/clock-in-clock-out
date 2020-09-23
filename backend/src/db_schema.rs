@@ -1,3 +1,9 @@
+/* 
+    Diesel overwrites every schema generation, wiping out Enum definitions.
+    This is the safe file and contains imports that Diesel cannot imply iteself.
+    --> THIS IS THE SCHEMA IMPORTED IN THE PROJECT <--
+*/
+
 table! {
     tags (id) {
         id -> Uuid,
@@ -28,7 +34,7 @@ table! {
 table! {
     use diesel::sql_types::Text;
     use diesel::sql_types::Uuid;
-    use crate::helpers::UsergroupMapping;
+    use crate::misc_helpers::UsergroupMapping;
     users (id) {
         id -> Uuid,
         email -> Text,

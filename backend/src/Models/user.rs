@@ -1,14 +1,14 @@
-use crate::schema::users;
+use crate::db_schema::users;
 use uuid::Uuid;
-use crate::helpers::Usergroup;
+use crate::misc_helpers::Usergroup;
 
-#[derive(Queryable, Serialize)]
+#[derive(Debug, Queryable, Serialize)]
 pub struct FetchUser {
     pub id: Uuid,
     pub email: String,
 }
 
-#[derive(Queryable, Deserialize)]
+#[derive(Debug, Queryable, Deserialize)]
 pub struct PostUser {
     pub email: String,
     pub password: String,
