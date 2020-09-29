@@ -1,4 +1,4 @@
-### Clock In/Clock Out
+# Clock In/Clock Out
 
 https://clockinout.net
 
@@ -7,7 +7,7 @@ https://clockinout.net
 
 ## Setting Up
 
-# Environment Variables
+### Environment Variables
 This project uses `docker-compose` for development and deployment. Before starting the containers, you'll need some environment variables to make them work.
 
 In the root directory, create a file named `docker.env` containing the following values:
@@ -27,7 +27,7 @@ JWT_SECRET=thisIsAnExampleJWTsecret_UwU
 ```
 Make sure that `user`and `password` are the same as the `POSTGRES_USER` and `POSTGRES_PASSWORD` defined in `docker.env`. The rest of `DATABASE_URL` should be left the same.
 
-# Rust Tools
+### Rust Tools
 Firstly, install Rust, `rust-up` and `cargo` with:
 
 `curl --proto '=https' --tlsv1.2 -sSf https://sh.rustup.rs | sh`
@@ -40,14 +40,16 @@ Make sure you selected `nightly` rust with `modify PATH vairable: yes`:
     profile: default
     modify PATH variable: yes
 ```
-# docker-compose
+## Development
+
+### docker-compose
 The development environment can be run with:
 
 `docker-compose up -d` (you may need to use `sudo`)
 
 Changes in both the `frontend` and `backend` folders will hot-reload, so you don't need to restart the containers every change.
 
-# Database Migrations
+### Database Migrations
 You will need to apply database migrations through `diesel-cli`. This is an ORM tool written in Rust and used to handle the database connections and queries in the Rust API (`backend`). Install diesel with:
 
 `cargo install diesel_cli --no-default-features --features postgres`
