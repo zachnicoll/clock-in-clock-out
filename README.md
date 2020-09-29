@@ -72,3 +72,7 @@ The site is currently deployed at http://clockinout.net, running on a Linode ser
 `docker-compose -f docker-compose-prod.yml up -d --build`
 
 This is not necessary for normal development.
+
+# Resources
+Installing Rust -> https://www.rust-lang.org/tools/install
+Get Started w/ Diesel -> http://diesel.rs/guides/getting-started/
