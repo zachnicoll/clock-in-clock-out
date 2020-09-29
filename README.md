@@ -1,6 +1,6 @@
 # Clock In/Clock Out
 
-https://clockinout.net
+http://clockinout.net
 
 ## Description
  An application targetted at business owners, team leads, project mangers and corporations that operate via a ticketing systems, like Jira, and need to keep track of their employee's tasks throughout the day. This tool is useful for centralising time tracking on tickets and gaining statistics on employees like utilisation and averages in certain categories of work.
@@ -67,7 +67,7 @@ And create a new migration with:
 `diesel migration generate migration_name`
 
 ## Deployment
-The site is currently deployed at https://clockinout.net, running on a Linode server. To run the "production" build of the app, use:
+The site is currently deployed at http://clockinout.net, running on a Linode server. To run the "production" build of the app, use:
 
 `docker-compose -f docker-compose-prod.yml up -d --build`
 
