@@ -1,68 +1,72 @@
-This project was bootstrapped with [Create React App](https://github.com/facebook/create-react-app).
+### Clock In/Clock Out
 
-## Available Scripts
+https://clockinout.net
 
-In the project directory, you can run:
+## Description
+ An application targetted at business owners, team leads, project mangers and corporations that operate via a ticketing systems, like Jira, and need to keep track of their employee's tasks throughout the day. This tool is useful for centralising time tracking on tickets and gaining statistics on employees like utilisation and averages in certain categories of work.
 
-### `yarn start`
+## Setting Up
 
-Runs the app in the development mode.<br />
-Open [http://localhost:3000](http://localhost:3000) to view it in the browser.
+# Environment Variables
+This project uses `docker-compose` for development and deployment. Before starting the containers, you'll need some environment variables to make them work.
 
-The page will reload if you make edits.<br />
-You will also see any lint errors in the console.
+In the root directory, create a file named `docker.env` containing the following values:
+ ```
+POSTGRES_PASSWORD=password                  // Change this to desired password
+POSTGRES_USER=user                          // Change this to desired username
+POSTGRES_DB=cico                            // LEAVE THIS
+PGADMIN_DEFAULT_EMAIL=admin@example.com     // Change this to desired email (can be fake)
+PGADMIN_DEFAULT_PASSWORD=pgadminpassword    // Change to desired password
+ ```
 
-### `yarn test`
+ In the `backend` directory, create a file named `.env` containing the following values:
+```
+DATABASE_URL=postgres://user:password@postgres-dev/cico
+JWT_SECRET=thisIsAnExampleJWTsecret_UwU
 
-Launches the test runner in the interactive watch mode.<br />
-See the section about [running tests](https://facebook.github.io/create-react-app/docs/running-tests) for more information.
+```
+Make sure that `user`and `password` are the same as the `POSTGRES_USER` and `POSTGRES_PASSWORD` defined in `docker.env`. The rest of `DATABASE_URL` should be left the same.
 
-### `yarn build`
+# Rust Tools
+Firstly, install Rust, `rust-up` and `cargo` with:
 
-Builds the app for production to the `build` folder.<br />
-It correctly bundles React in production mode and optimizes the build for the best performance.
+`curl --proto '=https' --tlsv1.2 -sSf https://sh.rustup.rs | sh`
+`export PATH=PATH:~/.cargo/bin`
 
-The build is minified and the filenames include the hashes.<br />
-Your app is ready to be deployed!
+Make sure you selected `nightly` rust with `modify PATH vairable: yes`:
+```
+    default host triple: x86_64-unknown-linux-gnu
+    default toolchain: nightly
+    profile: default
+    modify PATH variable: yes
+```
+# docker-compose
+The development environment can be run with:
 
-See the section about [deployment](https://facebook.github.io/create-react-app/docs/deployment) for more information.
+`docker-compose up -d` (you may need to use `sudo`)
 
-### `yarn eject`
+Changes in both the `frontend` and `backend` folders will hot-reload, so you don't need to restart the containers every change.
 
-**Note: this is a one-way operation. Once you `eject`, you can’t go back!**
+# Database Migrations
+You will need to apply database migrations through `diesel-cli`. This is an ORM tool written in Rust and used to handle the database connections and queries in the Rust API (`backend`). Install diesel with:
 
-If you aren’t satisfied with the build tool and configuration choices, you can `eject` at any time. This command will remove the single build dependency from your project.
+`cargo install diesel_cli --no-default-features --features postgres`
 
-Instead, it will copy all the configuration files and the transitive dependencies (webpack, Babel, ESLint, etc) right into your project so you have full control over them. All of the commands except `eject` will still work, but they will point to the copied scripts so you can tweak them. At this point you’re on your own.
+To apply migrations to the `postgres-dev` container, `cd backend` and run the following command:
 
-You don’t have to ever use `eject`. The curated feature set is suitable for small and middle deployments, and you shouldn’t feel obligated to use this feature. However we understand that this tool wouldn’t be useful if you couldn’t customize it when you are ready for it.
+`diesel --database-url postgres://user:password@localhost:5432/cico migration run`
 
-## Learn More
+Revert the last migration with:
 
-You can learn more in the [Create React App documentation](https://facebook.github.io/create-react-app/docs/getting-started).
+`diesel --database-url postgres://user:password@localhost:5432/cico migration revert`
 
-To learn React, check out the [React documentation](https://reactjs.org/).
+And create a new migration with:
 
-### Code Splitting
+`diesel migration generate migration_name`
 
-This section has moved here: https://facebook.github.io/create-react-app/docs/code-splitting
+## Deployment
+The site is currently deployed at https://clockinout.net, running on a Linode server. To run the "production" build of the app, use:
 
-### Analyzing the Bundle Size
+`docker-compose -f docker-compose-prod.yml up -d --build`
 
-This section has moved here: https://facebook.github.io/create-react-app/docs/analyzing-the-bundle-size
-
-### Making a Progressive Web App
-
-This section has moved here: https://facebook.github.io/create-react-app/docs/making-a-progressive-web-app
-
-### Advanced Configuration
-
-This section has moved here: https://facebook.github.io/create-react-app/docs/advanced-configuration
-
-### Deployment
-
-This section has moved here: https://facebook.github.io/create-react-app/docs/deployment
-
-### `yarn build` fails to minify
-
-This section has moved here: https://facebook.github.io/create-react-app/docs/troubleshooting#npm-run-build-fails-to-minify
+This is not necessary for normal development.
