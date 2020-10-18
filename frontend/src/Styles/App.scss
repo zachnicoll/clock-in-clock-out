@@ -1,8 +1,29 @@
-.pagecontainer{
+hr {
+    border: none;
+    height: 2px;
+    background-color: black;
+    width: 80%;
+}
+
+
+.page-container{
     width: 100%;
     display: flex;
     flex: 1;
     flex-direction: column;
     align-items: center;
     justify-content: center;
+}
+
+.flex-row {
+    display: flex;
+    flex-direction: row;
+    align-items: center;
+}
+
+.flex-row-between {
+    display: flex;
+    flex-direction: row;
+    align-items: center;
+    justify-content: space-between;
 }

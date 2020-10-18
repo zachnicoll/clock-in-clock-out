@@ -6,7 +6,7 @@ import ClockInClockOut from '../Components/ClockInClockOut';
 export default function HomePage(){
 
     return(
-        <div className="pagecontainer">
+        <div className="page-container">
             <ClockInClockOut />
             <TimeTracker />
         </div>
