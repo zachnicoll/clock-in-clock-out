@@ -16,6 +16,7 @@ use chrono::{NaiveDateTime, Utc};
     Route:      /api/tasks
     Method:     POST
     Info:       Create a Task given owner_id, duration, start, and optional label attribute.
+    Authorized: True
 */
 #[post("/", format = "json", data = "<new_task>")]
 pub fn create_task(conn: DbConn, _jwt: JWT, new_task: Json<PostTask>) -> ApiResponse {
@@ -73,6 +74,7 @@ pub fn create_task(conn: DbConn, _jwt: JWT, new_task: Json<PostTask>) -> ApiResp
                 If no start_date is specified, all tasks up until end_date are returned.
                 If no end_date is specified, all tasks from start_date are returned.
                 Dates must be formated like "YYYY-MM-DDTHH:ss:ss" and should be in UTC time.
+    Authorized: True
 */
 #[get("/<user_id>?<start_date>&<end_date>")]
 pub fn get_task_date(
@@ -163,6 +165,7 @@ pub fn get_task_date(
     Route:      /api/tasks/<user_id>/<task_id>
     Method:     GET
     Info:       Get a Task for a given user_id, with ID task_id.
+    Authorized: True
 */
 #[get("/<user_id>/<task_id>")]
 pub fn get_task(conn: DbConn, _jwt: JWT, user_id: UuidParam, task_id: UuidParam) -> ApiResponse {

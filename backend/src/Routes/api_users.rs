@@ -18,7 +18,8 @@ use uuid::Uuid;
 /*
     Route:      /api/users/<id>
     Method:     GET
-    Info:       Gets a users based on <id> (Uuid) param
+    Info:       Gets a user based on <id> (Uuid) param
+    Authorized: True
 */
 #[get("/<id>")]
 pub fn get_user(conn: DbConn, _jwt: JWT, id: UuidParam) -> ApiResponse {
@@ -43,6 +44,7 @@ pub fn get_user(conn: DbConn, _jwt: JWT, id: UuidParam) -> ApiResponse {
     Route:      /api/users
     Method:     POST
     Info:       Creates a user with given ID and password. Password is hashed before storage
+    Authorized: False
 */
 #[post("/", format = "json", data = "<new_user>")]
 pub fn create_user(conn: DbConn, new_user: Json<PostUser>) -> ApiResponse {
@@ -96,6 +98,7 @@ pub fn create_user(conn: DbConn, new_user: Json<PostUser>) -> ApiResponse {
     Route:      /api/users/login
     Method:     POST
     Info:       Provides user with JWT token if their credentials are correct
+    Authorized: False
 */
 #[post("/login", format = "json", data = "<credentials>")]
 pub fn login(conn: DbConn, credentials: Json<PostUser>) -> ApiResponse {

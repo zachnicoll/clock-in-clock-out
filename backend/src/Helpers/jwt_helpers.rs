@@ -28,9 +28,6 @@ fn is_valid(jwt: &str) -> bool {
     else{
         let token = &jwt[7..];
         let token_message = decode::<Claims>(&token, &DecodingKey::from_secret(JWT_SECRET.as_ref()), &Validation::new(Algorithm::HS256));
-
-        println!("Decoded JWT: {:?}", token_message);
-
         return match token_message {
             Ok(_msg) => true,
             Err(_) => false
