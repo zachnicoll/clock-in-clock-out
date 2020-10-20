@@ -1,8 +1,11 @@
 import React, { useState, useEffect } from "react";
 import { useTimer } from "../Hooks/useTimer";
 import { FormatDuration } from "../Functions/FormatDuration";
-import If from "./If";
-import moment from "moment";
+
+const clock_in_un_pressed = require("../Assests/clock_in_un_pressed.svg");
+const clock_in_pressed = require("../Assests/clock_in_pressed.svg");
+const clock_out_un_pressed = require("../Assests/clock_out_un_pressed.svg");
+const clock_out_pressed = require("../Assests/clock_out_pressed.svg");
 
 export default function ClockInClockOut() {
     const { getDuration, start, stop } = useTimer();
@@ -22,35 +25,20 @@ export default function ClockInClockOut() {
         <div className="clockinoutcontainer">
             <h1 className="time">{FormatDuration(getDuration())}</h1>
 
-            <div style={{width:"100%", flexWrap: "wrap"}}
-            >
-                <If condition={!clockedIn}>
-                    <img
-                        src={require("../Assests/clock_in_un_pressed.svg")}
-                        onClick={() => clockIn()}
-                        style={{cursor: "pointer"}}
-                        alt="Clock In"
-                    />
+            <div style={{width:"100%", flexWrap: "wrap"}}>
+                <img
+                    src={clockedIn ? clock_in_pressed : clock_in_un_pressed}
+                    onClick={() => !clockedIn ? clockIn() : {}}
+                    style={{cursor: !clockedIn ? "pointer" : "default"}}
+                    alt="Clock In"
+                />
 
-                    <img
-                        src={require("../Assests/clock_out_pressed.svg")}
-                        alt="Clock Out"
-                    />
-                </If>
-
-                <If condition={clockedIn}>
-                    <img
-                        src={require("../Assests/clock_in_pressed.svg")}
-                        alt="Clock In"
-                    />
-
-                    <img
-                        src={require("../Assests/clock_out_un_pressed.svg")}
-                        onClick={() => clockOut()}
-                        style={{cursor: "pointer"}}
-                        alt="Clock Out"
-                    />
-                </If>
+                <img
+                    src={clockedIn ? clock_out_un_pressed : clock_out_pressed}
+                    onClick={() => clockedIn ? clockOut() : {}}
+                    style={{cursor: clockedIn ? "pointer" : "default"}}
+                    alt="Clock Out"
+                />
             </div>
         </div>
     );

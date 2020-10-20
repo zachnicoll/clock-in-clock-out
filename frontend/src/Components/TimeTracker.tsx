@@ -34,7 +34,7 @@ export function TimeTracker() {
 
     return (
         <div style={{ width: "100%" }}>
-            <div className="trackerband">
+            <div className="tracker-band">
                     <Input
                         name="ticket"
                         type="text"
@@ -63,19 +63,21 @@ export function TimeTracker() {
                         value={label}
                         onChange={setLabel}
                     />
-                    <h2>{FormatDuration(getDuration())}</h2>
+                    <div className="flex-row">
+                        <h2>{FormatDuration(getDuration())}</h2>
 
-                    <If condition={!timing}>
-                        <div onClick={() => start()}>
-                            <PlayArrow className="trackericon" />
-                        </div>
-                    </If>
+                        <If condition={!timing}>
+                            <div onClick={() => start()}>
+                                <PlayArrow className="trackericon" />
+                            </div>
+                        </If>
 
-                    <If condition={timing}>
-                        <div onClick={() => AddTask()}>
-                            <Stop className="trackericon" />
-                        </div>
-                    </If>
+                        <If condition={timing}>
+                            <div onClick={() => AddTask()}>
+                                <Stop className="trackericon" />
+                            </div>
+                        </If>
+                    </div>
             </div>
 
             <div className="cardcontainer">

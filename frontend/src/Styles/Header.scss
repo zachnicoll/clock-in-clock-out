@@ -1,7 +1,7 @@
 .headercontainer {
   width: 100%;
   height: 5rem;
-  background-color: #264653;
+  background-color: $dark-blue;
   display: flex;
   flex-direction: row;
   justify-content: space-between;
@@ -10,7 +10,7 @@
   .headerbutton{
     width: 5rem;
     height: 5rem;
-    background-color: #2A9D8F;
+    background-color: $turquoise;
     display: flex;
     align-items: center;
     justify-content: center;
@@ -18,12 +18,12 @@
   }
 
   .headerbutton:hover {
-    background-color: #E9C46A;
+    background-color: $orange-yellow;
   }
 
   .headericon{
     width: 70%;
     height: 70%;
-    color: #264653;
+    color: $dark-blue;
   }
 }

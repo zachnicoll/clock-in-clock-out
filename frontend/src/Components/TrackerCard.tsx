@@ -20,7 +20,7 @@ export default function TrackerCard(props: ITrackerCardProps) {
     const [date, setDate] = useState(props.date);
 
     return (
-        <div className="trackercard">
+        <div className="tracker-card flex-row">
                 <Input
                     name="ticket"
                     type="text"

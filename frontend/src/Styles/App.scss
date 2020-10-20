@@ -5,6 +5,22 @@ hr {
     width: 80%;
 }
 
+button {
+    display: block;
+    border: none;
+    background-color: $turquoise;
+    font-size: 1rem;
+    margin: 1rem;
+    padding: 1rem;
+    border-radius: 1rem;
+    width: 100%;
+    color: white;
+    font-family: 'Sora';
+}
+
+button:hover {
+    background-color: $dark-blue;
+}
 
 .page-container{
     width: 100%;

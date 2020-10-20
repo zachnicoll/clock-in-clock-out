@@ -1,16 +1,17 @@
-.trackerband {
-    background-color: #2a9d8f;
+.tracker-band {
+    background-color: $turquoise;
     padding: 1rem;
     display: flex;
     flex: 1;
     align-items: center;
     justify-content: center;
+    flex-wrap: wrap;
 }
 
 .trackericon {
     width: 2rem !important;
     height: 2rem !important;
-    color: #264653;
+    color: $dark-blue;
 }
 
 .trackerinput {
@@ -40,19 +41,13 @@
     width: 10%;
 }
 
-.trackercard {
-    width: fit-content;
-    max-width: 60rem;
+.tracker-card {
     padding: 1rem;
     justify-content: center;
     background-color: #F4A261;
-    display: flex;
-    flex: 1;
-    margin-left: auto;
-    margin-right: auto;
     margin-bottom: 2rem;
     border-radius: 1rem;
-    align-items: center;
+    flex-wrap: wrap;
 }
 
 .cardcontainer {
