@@ -8,7 +8,7 @@ use diesel_derive_enum::*;
 use uuid::Uuid;
 use std::ops::Deref;
 
-use chrono::{DateTime, Utc, NaiveDateTime, NaiveDate};
+use chrono::{DateTime, Utc, NaiveDateTime};
 
 #[derive(Debug, Serialize, Deserialize, DbEnum)]
 pub enum Usergroup {

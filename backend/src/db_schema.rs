@@ -34,7 +34,7 @@ table! {
 table! {
     use diesel::sql_types::Text;
     use diesel::sql_types::Uuid;
-    use crate::misc_helpers::UsergroupMapping;
+    use crate::misc::UsergroupMapping;
     users (id) {
         id -> Uuid,
         email -> Text,

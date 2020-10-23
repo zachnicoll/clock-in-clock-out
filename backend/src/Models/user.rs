@@ -1,6 +1,6 @@
 use crate::db_schema::users;
 use uuid::Uuid;
-use crate::misc_helpers::Usergroup;
+use crate::misc::Usergroup;
 
 #[derive(Debug, Queryable, Serialize)]
 pub struct FetchUser {

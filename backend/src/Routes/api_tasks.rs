@@ -3,8 +3,8 @@ mod task;
 
 use crate::db_schema::tasks;
 use diesel::prelude::*;
-use crate::jwt_helpers::*;
-use crate::misc_helpers::*;
+use crate::jwt::*;
+use crate::misc::*;
 use crate::DbConn;
 use rocket::http::Status;
 use rocket_contrib::json::Json;
@@ -19,7 +19,7 @@ use chrono::{NaiveDateTime, Utc};
     Authorized: True
 */
 #[post("/", format = "json", data = "<new_task>")]
-pub fn create_task(conn: DbConn, _jwt: JWT, new_task: Json<PostTask>) -> ApiResponse {
+pub fn create_task(conn: DbConn, _authed: Auth, new_task: Json<PostTask>) -> ApiResponse {
     let task = Task {
         id: Uuid::new_v4(),
         owner_id: new_task.0.owner_id,
@@ -79,7 +79,7 @@ pub fn create_task(conn: DbConn, _jwt: JWT, new_task: Json<PostTask>) -> ApiResp
 #[get("/<user_id>?<start_date>&<end_date>")]
 pub fn get_task_date(
     conn: DbConn,
-    _jwt: JWT,
+    _authed: Auth,
     user_id: UuidParam,
     start_date: Option<Result<NaiveDateForm, &rocket::http::RawStr>>,
     end_date: Option<Result<NaiveDateForm, &rocket::http::RawStr>>,
@@ -168,7 +168,7 @@ pub fn get_task_date(
     Authorized: True
 */
 #[get("/<user_id>/<task_id>")]
-pub fn get_task(conn: DbConn, _jwt: JWT, user_id: UuidParam, task_id: UuidParam) -> ApiResponse {
+pub fn get_task(conn: DbConn, _authed: Auth, user_id: UuidParam, task_id: UuidParam) -> ApiResponse {
     let task_query = tasks::table
     .select((
         tasks::id,

@@ -17,6 +17,7 @@ jsonwebtoken = "7"
 chrono = "0.4.15"
 uuid = { version = "0.8", features = ["serde", "v4"] }
 diesel_migrations = "1.4.0"
+redis = "0.17.0"
 
 [dependencies.dotenv_codegen]
 version = "0.15.0"

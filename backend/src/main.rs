@@ -6,7 +6,7 @@
 #[macro_use] extern crate serde_derive;
 extern crate serde;
 extern crate serde_json;
-
+extern crate redis;
 extern crate dotenv;
 use dotenv::dotenv;
 #[macro_use]
@@ -60,10 +60,12 @@ impl Deref for DbConn {
 }
 
 mod db_schema;
-#[path = "./Helpers/misc_helpers.rs"]
-mod misc_helpers;
-#[path = "./Helpers/jwt_helpers.rs"]
-mod jwt_helpers;
+#[path = "./Helpers/misc.rs"]
+mod misc;
+#[path = "./Helpers/jwt.rs"]
+mod jwt;
+#[path = "Helpers/redis_helpers.rs"]
+mod redis_helpers;
 #[path = "./Routes/api_users.rs"]
 mod api_users;
 #[path = "./Routes/api_tasks.rs"]
