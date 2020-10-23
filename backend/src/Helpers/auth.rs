@@ -97,6 +97,7 @@ impl<'a, 'r> FromRequest<'a, 'r> for Auth{
 
                         return match cached_ip {
                             Ok(ip) => {
+                                println!("Client IP was found to be: {}", ip);
                                 // If the IPs don't match, reject the request
                                 // The user must re-login from the new IP in order to auth successfully
                                 if ip != request.client_ip().unwrap().to_string() {

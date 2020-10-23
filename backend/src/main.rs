@@ -62,8 +62,8 @@ impl Deref for DbConn {
 mod db_schema;
 #[path = "./Helpers/misc.rs"]
 mod misc;
-#[path = "./Helpers/jwt.rs"]
-mod jwt;
+#[path = "Helpers/auth.rs"]
+mod auth;
 #[path = "Helpers/redis_helpers.rs"]
 mod redis_helpers;
 #[path = "./Routes/api_users.rs"]

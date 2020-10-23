@@ -3,7 +3,7 @@ mod task;
 
 use crate::db_schema::tasks;
 use diesel::prelude::*;
-use crate::jwt::*;
+use crate::auth::*;
 use crate::misc::*;
 use crate::DbConn;
 use rocket::http::Status;
@@ -45,7 +45,6 @@ pub fn create_task(conn: DbConn, _authed: Auth, new_task: Json<PostTask>) -> Api
             status: Status::Ok,
         },
         Err(e) => {
-            println!("Creating task failed: {:?}", e);
             return match e {
                 diesel::result::Error::DatabaseError(_, _) => ApiResponse {
                     json: json!({

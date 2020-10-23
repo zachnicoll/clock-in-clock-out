@@ -1,6 +1,6 @@
-version: "3.1"
+version: "3.8"
 services:
-    postgres-prod:
+    postgres:
         container_name: postgres
         image: postgres:11-alpine
         restart: always
@@ -13,7 +13,7 @@ services:
             - "/var/run/postgres/postgres.sock:/var/run/postgres/postgres.sock"
             - dbdata:/var/lib/postgresql/data
             
-    web-prod:
+    web:
         container_name: web
         build:
             context: ./frontend
@@ -21,13 +21,19 @@ services:
         volumes:
             - ./frontend:/usr/src/app
         ports:
-            - "80:80"
-            - "443:443"
+            - target: 80
+              published: 80
+              protocol: tcp
+              mode: host
+            - target: 443
+              published: 443
+              protocol: tcp
+              mode: host
         links:
-            - api-prod
+            - api
         restart: always
 
-    api-prod:
+    api:
         container_name: api
         build:
             context: ./backend
@@ -37,10 +43,10 @@ services:
         volumes:
             - ./backend:/usr/src/app
         links:
-            - postgres-prod
+            - postgres
             - redis
         depends_on: 
-            - postgres-prod
+            - postgres
             - redis
         env_file: docker.env
         command: bash -c "/cico-api"

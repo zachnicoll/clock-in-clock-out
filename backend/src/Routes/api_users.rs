@@ -5,7 +5,7 @@ use rocket_contrib::json::Json;
 use rocket::http::Status;
 use crate::DbConn;
 use crate::misc::*;
-use crate::jwt::*;
+use crate::auth::*;
 use crate::db_schema::users;
 use user::{PostUser, FetchUser, User};
 use bcrypt::{hash, verify, DEFAULT_COST};
@@ -63,8 +63,6 @@ pub fn create_user(conn: DbConn, new_user: Json<PostUser>) -> ApiResponse {
                 user_group: Usergroup::User
             };
 
-            println!("Attempting to insert user: {:?}", user);
-
             let result = diesel::insert_into(users::table)
                 .values(user)
                 .returning((users::id, users::email))
@@ -76,7 +74,6 @@ pub fn create_user(conn: DbConn, new_user: Json<PostUser>) -> ApiResponse {
                     status: Status::Ok,
                 },
                 Err(e) => {
-                    println!("Creating user failed: {:?}", e);
                     ApiResponse {
                         json: json!({
                             "error" : "true",
@@ -118,6 +115,7 @@ pub fn login(addr: SocketAddr, conn: DbConn, credentials: Json<PostUser>) -> Api
 
                     match cache_conn {
                         Ok(mut conn) => {
+                            println!("Login IP is: {}", addr.ip().to_string());
                             conn.set::<&String, String, String>(&credentials.email, addr.ip().to_string());
                             let expiry = Utc::now() + Duration::days(1);
                             let claim = Claims {

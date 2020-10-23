@@ -26,14 +26,11 @@ table! {
 }
 
 table! {
-    use diesel::sql_types::Text;
-    use diesel::sql_types::Uuid;
-    use crate::helpers::UsergroupMapping;
     users (id) {
         id -> Uuid,
         email -> Text,
         password -> Text,
-        user_group -> UsergroupMapping,
+        user_group -> USERGROUP,
     }
 }
 
