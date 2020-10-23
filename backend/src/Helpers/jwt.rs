@@ -95,7 +95,7 @@ impl<'a, 'r> FromRequest<'a, 'r> for Auth{
                         // Get user's current recorded IP
                         let cached_ip = conn.get::<&String, String>(&user_email);
 
-                        match cached_ip {
+                        return match cached_ip {
                             Ok(ip) => {
                                 // If the IPs don't match, reject the request
                                 // The user must re-login from the new IP in order to auth successfully

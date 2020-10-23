@@ -38,8 +38,10 @@ services:
             - ./backend:/usr/src/app
         links:
             - postgres-prod
+            - redis
         depends_on: 
             - postgres-prod
+            - redis
         env_file: docker.env
         command: bash -c "/cico-api"
         restart: always
