@@ -79,6 +79,10 @@ impl<'a, 'r> FromRequest<'a, 'r> for Auth{
         // Retrieve JWT string from Authorization header
         let jwt: Vec<_> = request.headers().get("Authorization").collect();
 
+        let x_real_ip: Vec<_> = request.headers().get("X-Real-IP").collect();
+
+        println!("X-REAL-IP: {}", x_real_ip[0]);
+
         match jwt.len() {
             0 => Outcome::Failure((Status::BadRequest, AuthError::Missing)), // If the vector has length 0, then the header doesn't exists
             1 if convert_to_jwt(jwt[0]).is_valid => {
