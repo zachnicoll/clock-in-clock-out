@@ -6,9 +6,9 @@ use rocket::Outcome;
 use crate::misc::Usergroup;
 use redis::Commands;
 use crate::redis_helpers::{redis_conn};
+use std::env;
 
 pub const JWT_SECRET: &str = dotenv!("JWT_SECRET");
-
 
 // Claim struct for JWT token creation
 #[derive(Debug, Serialize, Deserialize)]
@@ -25,6 +25,8 @@ pub struct JWT {
     claim: Option<Claims>
 }
 
+pub struct ClientIP (pub String);
+
 pub struct Auth {
     jwt: JWT,
     valid_session: bool
@@ -37,6 +39,11 @@ pub enum AuthError {
     CacheFailed,
     BadSession
 }
+
+#[derive(Debug)]
+pub enum ClientIPError {NotPresent}
+
+
 
 /// Returns true if `key` is a valid API key string.
 fn convert_to_jwt(jwt: &str) -> JWT {
@@ -72,7 +79,7 @@ fn convert_to_jwt(jwt: &str) -> JWT {
 }
 
 // Each route with an Auth-typed param will first go through this request guard
-impl<'a, 'r> FromRequest<'a, 'r> for Auth{
+impl<'a, 'r> FromRequest<'a, 'r> for Auth {
     type Error = AuthError;
 
     fn from_request(request: &'a Request<'r>) -> request::Outcome<Self, Self::Error> {
@@ -81,7 +88,9 @@ impl<'a, 'r> FromRequest<'a, 'r> for Auth{
 
         let x_real_ip: Vec<_> = request.headers().get("X-Real-IP").collect();
 
-        println!("X-REAL-IP: {}", x_real_ip[0]);
+        if env::var("DEV").unwrap() == "0" {
+            println!("Trying to authenticate for IP {}...", &x_real_ip[0].to_string())
+        }
 
         match jwt.len() {
             0 => Outcome::Failure((Status::BadRequest, AuthError::Missing)), // If the vector has length 0, then the header doesn't exists
@@ -100,11 +109,11 @@ impl<'a, 'r> FromRequest<'a, 'r> for Auth{
                         let cached_ip = conn.get::<&String, String>(&user_email);
 
                         return match cached_ip {
-                            Ok(ip) => {
-                                println!("Client IP was found to be: {}", ip);
+                            Ok(cached_ip) => {
+                                println!("Cached IP was found to be: {}", cached_ip);
                                 // If the IPs don't match, reject the request
                                 // The user must re-login from the new IP in order to auth successfully
-                                if ip != request.client_ip().unwrap().to_string() {
+                                if env::var("DEV").unwrap() == "0" && cached_ip != x_real_ip[0].to_string() {
                                     Outcome::Failure((Status::Conflict, AuthError::BadSession))
                                 }
                                 else {
@@ -121,6 +130,27 @@ impl<'a, 'r> FromRequest<'a, 'r> for Auth{
                 }
             },
             _ => Outcome::Failure((Status::Unauthorized, AuthError::Invalid)), // Invalid JWT
+        }
+    }
+}
+
+impl<'a, 'r> FromRequest<'a, 'r> for ClientIP {
+    type Error = ClientIPError;
+
+    fn from_request(request: &'a Request<'r>) -> request::Outcome<Self, Self::Error> {
+        let is_dev: String = env::var("DEV").unwrap(); // Check if in DEV mode or not
+        let x_real_ip: Vec<_> = request.headers().get("X-Real-IP").collect();
+
+        return match x_real_ip.len() {
+            0 => {
+                if is_dev == "0" {
+                    Outcome::Failure((Status::NotAcceptable, ClientIPError::NotPresent))
+                }
+                else {
+                    Outcome::Success(ClientIP("localhost".to_string()))
+                }
+            },
+            _ => Outcome::Success(ClientIP(x_real_ip[0].to_string()))
         }
     }
 }

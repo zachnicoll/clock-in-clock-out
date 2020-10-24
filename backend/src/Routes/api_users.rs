@@ -16,7 +16,6 @@ use jsonwebtoken::{encode,  Header, EncodingKey};
 use uuid::Uuid;
 use crate::redis_helpers::{redis_conn};
 use redis::{Commands};
-use std::net::SocketAddr;
 
 /*
     Route:      /api/users/<id>
@@ -101,7 +100,7 @@ pub fn create_user(conn: DbConn, new_user: Json<PostUser>) -> ApiResponse {
     Authorized: False
 */
 #[post("/login", format = "json", data = "<credentials>")]
-pub fn login(addr: SocketAddr, conn: DbConn, credentials: Json<PostUser>) -> ApiResponse {
+pub fn login(conn: DbConn, addr: ClientIP, credentials: Json<PostUser>) -> ApiResponse {
     let user = users::table
         .filter(users::email.eq(&credentials.email))
         .select((users::id, users::email, users::password, users::user_group))
@@ -115,8 +114,8 @@ pub fn login(addr: SocketAddr, conn: DbConn, credentials: Json<PostUser>) -> Api
 
                     match cache_conn {
                         Ok(mut conn) => {
-                            println!("Login IP is: {}", addr.ip().to_string());
-                            conn.set::<&String, String, String>(&credentials.email, addr.ip().to_string());
+                            println!("Login IP is: {}", addr.0);
+                            conn.set::<&String, String, String>(&credentials.email, addr.0);
                             let expiry = Utc::now() + Duration::days(1);
                             let claim = Claims {
                                 aud: credentials.0.email,

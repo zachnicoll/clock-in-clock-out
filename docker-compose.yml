@@ -40,6 +40,8 @@ services:
             - postgres
             - redis
         env_file: docker.env
+        environment:
+            - DEV=1
         command: bash -c "diesel setup && cargo watch -x run"
         restart: always
     

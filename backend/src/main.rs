@@ -85,7 +85,7 @@ fn main() {
 
     rocket::ignite()
         .mount("/api/hello", routes![hello])
-        .mount("/api/users", routes![get_user, create_user, login])
+        .mount("/api/users", routes![login, get_user, create_user])
         .mount("/api/tasks", routes![create_task, get_task, get_task_date])
         .manage(init_pool())
         .launch();

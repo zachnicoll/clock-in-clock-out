@@ -1,7 +1,7 @@
 version: "3.8"
 services:
     postgres:
-        container_name: postgres
+        container_name: postgres_prod
         image: postgres:11-alpine
         restart: always
         env_file: docker.env
@@ -14,7 +14,7 @@ services:
             - dbdata:/var/lib/postgresql/data
             
     web:
-        container_name: web
+        container_name: web_prod
         build:
             context: ./frontend
             dockerfile: Dockerfile-prod
@@ -27,7 +27,7 @@ services:
         restart: always
 
     api:
-        container_name: api
+        container_name: api_prod
         build:
             context: ./backend
             dockerfile: Dockerfile-prod
@@ -42,6 +42,8 @@ services:
             - postgres
             - redis
         env_file: docker.env
+        environment:
+            - DEV=0
         command: bash -c "/cico-api"
         restart: always
 
