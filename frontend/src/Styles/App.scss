@@ -43,3 +43,21 @@ button:hover {
     align-items: center;
     justify-content: space-between;
 }
+
+.flex-col {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+}
+
+.full-width {
+    width: 100%;
+}
+
+.half-width {
+    width: 50%;
+}
+
+.inner-padding {
+    padding: 1rem;
+}

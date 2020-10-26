@@ -4,3 +4,5 @@ target
 build
 .env
 .idea
+**/yarn.lock
+**/yarn-error.log

@@ -1,6 +1,6 @@
 import React from 'react';
 import './Styles/Imports.scss';
-import { HomePage, LoginPage, LandingPage } from './Pages/Pages';
+import { HomePage, RegisterPage, LandingPage } from './Pages/Pages';
 import Header from './Components/Header';
 import {
   BrowserRouter as Router,
@@ -8,6 +8,12 @@ import {
   Route,
   Link
 } from "react-router-dom";
+import Axios from 'axios';
+
+Axios.defaults.baseURL = 'http://localhost:8000/';
+Axios.defaults.headers = {
+  "Access-Control-Allow-Origin":"*"
+};
 
 function App() {
   return (
@@ -21,8 +27,8 @@ function App() {
         <Route exact path="/home">
           <HomePage />
         </Route>
-        <Route exact path="/login">
-          <LoginPage />
+        <Route exact path="/register">
+          <RegisterPage />
         </Route>
       </Switch>
     </Router>

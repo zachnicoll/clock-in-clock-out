@@ -1,5 +1,6 @@
 import React from 'react'
 import { useHistory } from 'react-router-dom'
+import Login from '../Components/Login';
 
 export default function LandingPage({navigation}:any) {
     const history = useHistory();
@@ -9,11 +10,10 @@ export default function LandingPage({navigation}:any) {
             <h1 style={{fontWeight:"normal", fontSize:"64px", textAlign: "center"}}>Clock-in/Clock-out</h1>
             <hr/>
             <h2>Track every task and ticket in one place.</h2>
-            <p>Please log-in to continue!</p>
-            <div className="flex-col" style={{width: "50%"}}>
-                <button onClick={() => history.push("/login")}>Login</button>
-                <button>Register</button>
+            <div className="half-width">
+                <Login />
             </div>
+            <p>Don't have an account? <a href="/register">Register.</a></p>
         </div>
     )
 }

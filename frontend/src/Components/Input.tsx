@@ -28,7 +28,7 @@ export default function Input(props: IInputProps) {
     }
 
     return (
-        <div className="inputcontainer">
+        <div className="input-container full-width">
             <p>{props.label}</p>
             <input
                 name={props.name}
