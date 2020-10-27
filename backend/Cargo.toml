@@ -18,6 +18,7 @@ chrono = "0.4.15"
 uuid = { version = "0.8", features = ["serde", "v4"] }
 diesel_migrations = "1.4.0"
 redis = "0.17.0"
+rocket_cors = "0.5.1"
 
 [dependencies.dotenv_codegen]
 version = "0.15.0"

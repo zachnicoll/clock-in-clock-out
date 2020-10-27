@@ -6,6 +6,7 @@ interface IInputProps {
     onChange: (text: string) => void;
     label?: string;
     className?: string;
+    containerClassName?: string;
     type?: string;
     value?: string;
 }
@@ -28,7 +29,7 @@ export default function Input(props: IInputProps) {
     }
 
     return (
-        <div className="input-container full-width">
+        <div className={`input-container ${props.containerClassName}`}>
             <p>{props.label}</p>
             <input
                 name={props.name}

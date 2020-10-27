@@ -33,12 +33,12 @@ export function TimeTracker() {
     }
 
     return (
-        <div style={{ width: "100%" }}>
+        <div className="full-width">
             <div className="tracker-band">
                     <Input
                         name="ticket"
                         type="text"
-                        className="trackerinput"
+                        className="tracker-input"
                         placeholder="[UNISD-101]"
                         label="Ticket"
                         value={ticket}
@@ -48,7 +48,7 @@ export function TimeTracker() {
                     <ComboBox
                         name="tag"
                         label="Tag"
-                        className="trackerinput"
+                        className="tracker-input"
                         onChange={setTag}
                         value={tag}
                         options={["Project Work", "Meeting", "Break", "Other"]}
@@ -57,7 +57,7 @@ export function TimeTracker() {
                     <Input
                         name="label"
                         type="text"
-                        className="trackerinput"
+                        className="tracker-input"
                         placeholder="Fixing issue..."
                         label="Label"
                         value={label}

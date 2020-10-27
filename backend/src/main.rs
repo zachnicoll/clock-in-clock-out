@@ -16,9 +16,14 @@ use diesel::PgConnection;
 use diesel::r2d2::{ConnectionManager, Pool, PooledConnection};
 
 use std::ops::Deref;
-use rocket::http::Status;
+use rocket::http::{Status, Method};
 use rocket::request::{self, FromRequest};
 use rocket::{Request, State, Outcome};
+
+use rocket_cors::{
+    AllowedHeaders, AllowedOrigins, Error, // 2.
+    Cors, CorsOptions // 3.
+};
 
 // An alias to the type for a pool of Diesel Pg connections.
 type PgPool = Pool<ConnectionManager<PgConnection>>;
@@ -74,6 +79,43 @@ mod api_tasks;
 use api_users::*;
 use api_tasks::*;
 
+fn make_cors() -> Cors {
+    let allowed_origins = AllowedOrigins::some_exact(&[
+        "http://localhost:3000",
+        "https://localhost:3000",
+        "http://localhost:8000",
+        "https://localhost:8000",
+        "http://localhost:80",
+        "https://localhost:443", 
+        "http://clockinout.net",
+        "https://clockinout.net",
+    ]);
+
+    CorsOptions { // 5.
+        allowed_origins,
+        allowed_methods: vec![
+            Method::Get, 
+            Method::Post, 
+            Method::Put, 
+            Method::Delete,
+            Method::Options,
+            ].into_iter().map(From::from).collect(), // 1.
+        allowed_headers: AllowedHeaders::some(&[
+            "Authorization",
+            "Accept",
+            "Access-Control-Allow-Origin",
+            "Content-Type",
+            "DNT",
+            "Referer",
+            "User-Agent"
+        ]),
+        allow_credentials: true,
+        ..Default::default()
+    }
+    .to_cors()
+    .expect("error while building CORS")
+}
+
 // Using this endpoint as the "check" to see if the server is running
 #[get("/")]
 fn hello() -> &'static str {
@@ -88,5 +130,6 @@ fn main() {
         .mount("/api/users", routes![login, get_user, create_user])
         .mount("/api/tasks", routes![create_task, get_task, get_task_date])
         .manage(init_pool())
+        .attach(make_cors())
         .launch();
 }

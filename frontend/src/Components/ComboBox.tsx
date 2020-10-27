@@ -25,7 +25,7 @@ export default function ComboBox(props: IComboProps) {
             <p>{props.label}</p>
             <select name={props.name} className={props.className} onChange={onChange} value={option}>
                 {props.options.map((option: string) => {
-                    return <option value={option}>{option}</option>;
+                    return <option key={option} value={option}>{option}</option>;
                 })}
             </select>
         </div>

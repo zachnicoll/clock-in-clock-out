@@ -24,7 +24,7 @@ export default function TrackerCard(props: ITrackerCardProps) {
                 <Input
                     name="ticket"
                     type="text"
-                    className="trackerinput"
+                    className="tracker-input"
                     label="Ticket"
                     onChange={setTicket}
                     value={props.ticket}
@@ -33,7 +33,7 @@ export default function TrackerCard(props: ITrackerCardProps) {
                 <ComboBox
                     name="tag"
                     label="Tag"
-                    className="trackerinput"
+                    className="tracker-input"
                     onChange={setTag}
                     options={["Project Work", "Meeting", "Break", "Other"]}
                     value={props.tag}
@@ -42,7 +42,7 @@ export default function TrackerCard(props: ITrackerCardProps) {
                 <Input
                     name="label"
                     type="text"
-                    className="trackerinput"
+                    className="tracker-input"
                     label="Label"
                     onChange={setLabel}
                     value={props.label}

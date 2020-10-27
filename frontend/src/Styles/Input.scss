@@ -10,22 +10,6 @@
     }
 }
 
-.login-input {
-    height: 1rem;
-    border-radius: 0.25rem;
-    padding: 0.5rem;
-    border: none;
-    background-color: $dark-blue;
-    align-self: center;
-    transition: 0.5s;
-    color: white;
-}
-
-.login-input:focus-within {
-    background-color: $orange-yellow;
-    color: black;
-}
-
 input:-webkit-autofill,
 input:-webkit-autofill:hover, 
 input:-webkit-autofill:focus,
