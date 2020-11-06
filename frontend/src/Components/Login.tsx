@@ -3,6 +3,7 @@ import React, { useContext, useState } from 'react'
 import { useHistory } from 'react-router-dom';
 import { AuthContext } from '../Helpers/AuthContext';
 import Input from './Input';
+import {ILoginData} from "../Models/ILoginData";
 
 export default function Login() {
     const [email, setEmail] = useState("");
@@ -11,12 +12,13 @@ export default function Login() {
     const history = useHistory();
     const setAuthContext = useContext(AuthContext)?.setAuthContext;
 
-    function login()
-    {
-        Axios.post('/api/users/login', {
+    function login() {
+        let loginData: ILoginData = {
             email: email,
             password: pass
-        })
+        };
+
+        Axios.post('/api/users/login', loginData)
         .then(res => {
             setAuthContext ? setAuthContext({
                 authed: true,
