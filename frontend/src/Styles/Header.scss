@@ -1,4 +1,4 @@
-.headercontainer {
+.header-container {
   width: 100%;
   height: 5rem;
   background-color: $dark-blue;
@@ -7,7 +7,7 @@
   justify-content: space-between;
   align-items: center;
 
-  .headerbutton{
+  .header-button{
     width: 5rem;
     height: 5rem;
     background-color: $turquoise;
@@ -17,11 +17,11 @@
     padding: 0px;
   }
 
-  .headerbutton:hover {
+  .header-button:hover {
     background-color: $orange-yellow;
   }
 
-  .headericon{
+  .header-icon{
     width: 70%;
     height: 70%;
     color: $dark-blue;

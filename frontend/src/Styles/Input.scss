@@ -8,6 +8,13 @@
     p {
         margin: 0px;
     }
+
+    .error-msg {
+      color: red;
+      font-size: 14px;
+      font-weight: 300;
+      margin-top: 0.5rem;
+    }
 }
 
 input:-webkit-autofill,

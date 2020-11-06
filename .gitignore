@@ -4,5 +4,6 @@ target
 build
 .env
 .idea
-**/yarn.lock
-**/yarn-error.log
+./frontend/yarn.lock
+./frontend/yarn-error.log
+./backend/Cargo.lock

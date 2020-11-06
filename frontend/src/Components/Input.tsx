@@ -9,6 +9,7 @@ interface IInputProps {
     containerClassName?: string;
     type?: string;
     value?: string;
+    errorMessage?: string;
 }
 
 export default function Input(props: IInputProps) {
@@ -39,6 +40,7 @@ export default function Input(props: IInputProps) {
                 value={text}
                 onChange={onChange}
             />
+            {props.errorMessage && <p className='error-msg'>{props.errorMessage}</p>}
         </div>
     );
 }
