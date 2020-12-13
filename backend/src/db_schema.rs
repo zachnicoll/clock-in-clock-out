@@ -1,4 +1,4 @@
-/* 
+/*
     Diesel overwrites every schema generation, wiping out Enum definitions.
     This is the safe file and contains imports that Diesel cannot imply iteself.
     --> THIS IS THE SCHEMA IMPORTED IN THE PROJECT <--
@@ -48,9 +48,4 @@ joinable!(task_tag -> tags (tag_id));
 joinable!(task_tag -> tasks (task_id));
 joinable!(tasks -> users (owner_id));
 
-allow_tables_to_appear_in_same_query!(
-    tags,
-    task_tag,
-    tasks,
-    users,
-);
+allow_tables_to_appear_in_same_query!(tags, task_tag, tasks, users,);

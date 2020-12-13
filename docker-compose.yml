@@ -1,18 +1,5 @@
 version: "3.8"
 services:
-    postgres:
-        container_name: postgres
-        image: postgres:11-alpine
-        restart: always
-        env_file: docker.env
-        environment:
-            PGDATA: /var/lib/postgresql/data/dbdata
-        ports: 
-            - 5432:5432
-        volumes:
-            - "/var/run/postgres/postgres.sock:/var/run/postgres/postgres.sock"
-            - dbdata:/var/lib/postgresql/data
-    
     web:
         container_name: web
         build: ./frontend
@@ -34,15 +21,10 @@ services:
         volumes:
             - ./backend:/usr/src/app
         links:
-            - postgres
             - redis:redis
-        depends_on: 
-            - postgres
+        depends_on:
             - redis
-        env_file: docker.env
-        environment:
-            - DEV=1
-        command: bash -c "diesel setup && cargo watch -x run"
+        command: bash -c "cargo watch -x run"
         restart: always
     
     redis:
@@ -52,6 +34,3 @@ services:
             - 6379
         ports:
             - "6379:6379"
-
-volumes:
-    dbdata:

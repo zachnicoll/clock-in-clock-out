@@ -1,18 +1,5 @@
 version: "3.8"
-services:
-    postgres:
-        container_name: postgres_prod
-        image: postgres:11-alpine
-        restart: always
-        env_file: docker.env
-        environment:
-            PGDATA: /var/lib/postgresql/data/dbdata
-        ports: 
-            - 5432:5432
-        volumes:
-            - "/var/run/postgres/postgres.sock:/var/run/postgres/postgres.sock"
-            - dbdata:/var/lib/postgresql/data
-            
+services:           
     web:
         container_name: web_prod
         build:
@@ -36,14 +23,9 @@ services:
         volumes:
             - ./backend:/usr/src/app
         links:
-            - postgres
             - redis
         depends_on: 
-            - postgres
             - redis
-        env_file: docker.env
-        environment:
-            - DEV=0
         command: bash -c "/cico-api"
         restart: always
 

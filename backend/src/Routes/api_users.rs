@@ -1,21 +1,21 @@
 #[path = "../Models/user.rs"]
 mod user;
 
-use rocket_contrib::json::Json;
-use rocket::http::Status;
-use crate::DbConn;
-use crate::misc::*;
 use crate::auth::*;
 use crate::db_schema::users;
-use user::{PostUser, FetchUser, User};
+use crate::misc::*;
+use crate::DbConn;
 use bcrypt::{hash, verify, DEFAULT_COST};
+use chrono::{Duration, Utc};
 use diesel::prelude::*;
-use chrono::{Utc, Duration};
-use jsonwebtoken::{encode,  Header, EncodingKey};
+use jsonwebtoken::{encode, EncodingKey, Header};
+use rocket::http::Status;
+use rocket_contrib::json::Json;
+use user::{FetchUser, PostUser, User};
 
+use crate::redis_helpers::redis_conn;
+use redis::Commands;
 use uuid::Uuid;
-use crate::redis_helpers::{redis_conn};
-use redis::{Commands};
 
 /*
     Route:      /api/users/<id>
@@ -59,7 +59,7 @@ pub fn create_user(conn: DbConn, new_user: Json<PostUser>) -> ApiResponse {
                 id: Uuid::new_v4(),
                 email: new_user.0.email,
                 password: hash,
-                user_group: Usergroup::User
+                user_group: Usergroup::User,
             };
 
             let result = diesel::insert_into(users::table)
@@ -69,17 +69,15 @@ pub fn create_user(conn: DbConn, new_user: Json<PostUser>) -> ApiResponse {
 
             return match result {
                 Ok(result) => ApiResponse {
-                    json: json!({ "user" : result }),
+                    json: json!({ "user": result }),
                     status: Status::Ok,
                 },
-                Err(e) => {
-                    ApiResponse {
-                        json: json!({
-                            "error" : "true",
-                            "message" : "Email already exists!"
-                        }),
-                        status: Status::BadRequest,
-                    }
+                Err(e) => ApiResponse {
+                    json: json!({
+                        "error" : "true",
+                        "message" : "Email already exists!"
+                    }),
+                    status: Status::BadRequest,
                 },
             };
         }
@@ -121,13 +119,17 @@ pub fn login(conn: DbConn, addr: ClientIP, credentials: Json<PostUser>) -> ApiRe
                                 aud: credentials.0.email,
                                 iss: String::from("clockinout.net"),
                                 exp: expiry.timestamp(),
-                                grp: Usergroup::User
+                                grp: Usergroup::User,
                             };
 
-                            let token = encode(&Header::default(), &claim, &EncodingKey::from_secret(JWT_SECRET.as_ref()));
+                            let token = encode(
+                                &Header::default(),
+                                &claim,
+                                &EncodingKey::from_secret(JWT_SECRET.as_ref()),
+                            );
                             let user_info = FetchUser {
                                 id: user.id,
-                                email: user.email
+                                email: user.email,
                             };
 
                             ApiResponse {
@@ -137,14 +139,14 @@ pub fn login(conn: DbConn, addr: ClientIP, credentials: Json<PostUser>) -> ApiRe
                                 }),
                                 status: Status::Ok,
                             }
-                        },
+                        }
                         Err(_) => ApiResponse {
                             json: json!({
                                 "error" : "true",
                                 "message" : "Something went wrong creating a user session, aborting."
                             }),
                             status: Status::BadRequest,
-                        }
+                        },
                     }
                 } else {
                     ApiResponse {

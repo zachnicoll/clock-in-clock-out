@@ -1,8 +1,7 @@
 use crate::db_schema::tasks;
-use uuid::Uuid;
 use crate::misc::json_time;
 use chrono::NaiveDateTime;
-
+use uuid::Uuid;
 
 #[derive(Debug, Insertable, Queryable, Deserialize, Serialize)]
 #[table_name = "tasks"]
@@ -12,7 +11,7 @@ pub struct Task {
     pub duration: i32,
     #[serde(with = "json_time")]
     pub start: NaiveDateTime,
-    pub label: Option<String>
+    pub label: Option<String>,
 }
 
 #[derive(Debug, Queryable, Deserialize)]
@@ -21,5 +20,5 @@ pub struct PostTask {
     pub duration: i32,
     #[serde(with = "json_time")]
     pub start: NaiveDateTime,
-    pub label: Option<String>
+    pub label: Option<String>,
 }

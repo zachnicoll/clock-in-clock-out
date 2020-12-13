@@ -4,7 +4,7 @@ import Axios from 'axios';
 import { AuthProvider } from './Helpers/AuthContext';
 import AppRouter from './AppRouter';
 
-Axios.defaults.baseURL = 'http://clockinout.net/';
+Axios.defaults.baseURL = 'http://localhost:8000/';
 
 function App() {
   return (

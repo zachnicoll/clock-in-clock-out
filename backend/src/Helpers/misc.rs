@@ -1,19 +1,19 @@
 extern crate diesel_derive_enum;
-use rocket_contrib::json::{JsonValue};
-use rocket::request::{Request, FromParam, FromFormValue};
+use diesel_derive_enum::*;
+use rocket::http::{ContentType, RawStr, Status};
+use rocket::request::{FromFormValue, FromParam, Request};
 use rocket::response;
 use rocket::response::{Responder, Response};
-use rocket::http::{ContentType, Status, RawStr};
-use diesel_derive_enum::*;
-use uuid::Uuid;
+use rocket_contrib::json::JsonValue;
 use std::ops::Deref;
+use uuid::Uuid;
 
-use chrono::{DateTime, Utc, NaiveDateTime};
+use chrono::{DateTime, NaiveDateTime, Utc};
 
 #[derive(Debug, Serialize, Deserialize, DbEnum)]
 pub enum Usergroup {
     User,
-    Admin
+    Admin,
 }
 
 // Generic struct for API Responses
@@ -41,18 +41,16 @@ pub struct UuidParam {
 }
 
 // Implement FromParam for Uuids so a Uuid can be used to query endpoints
-impl<'r> FromParam<'r> for UuidParam{
+impl<'r> FromParam<'r> for UuidParam {
     type Error = &'r RawStr;
 
-    fn from_param(param: &'r RawStr) -> Result<Self, Self::Error>{
+    fn from_param(param: &'r RawStr) -> Result<Self, Self::Error> {
         let id = Uuid::parse_str(param);
 
         return match id {
-            Ok(id) => Ok(UuidParam {
-                uuid: id
-            }),
-            Err(_) => return Err(param)
-        }
+            Ok(id) => Ok(UuidParam { uuid: id }),
+            Err(_) => return Err(param),
+        };
     }
 }
 
@@ -66,33 +64,40 @@ impl<'v> FromFormValue<'v> for NaiveDateForm {
 
         return match date {
             Ok(date) => Ok(NaiveDateForm(date)),
-            _ => Err(form_value)
-        }
+            _ => Err(form_value),
+        };
     }
 }
 
-impl Deref for NaiveDateForm{
+impl Deref for NaiveDateForm {
     type Target = NaiveDateTime;
 
-    fn deref(&self)-> &Self::Target{
+    fn deref(&self) -> &Self::Target {
         &self.0
     }
 }
 
 pub mod json_time {
-	use super::*;
-    use serde::{Serialize, Serializer, Deserialize, Deserializer, de::Error};
-    
+    use super::*;
+    use serde::{de::Error, Deserialize, Deserializer, Serialize, Serializer};
+
     fn time_to_json(t: NaiveDateTime) -> String {
         DateTime::<Utc>::from_utc(t, Utc).to_rfc3339()
     }
 
-	pub fn serialize<S: Serializer>(time: &NaiveDateTime, serializer: S) -> Result<S::Ok, S::Error> {
-		time_to_json(time.clone()).serialize(serializer)
-	}
+    pub fn serialize<S: Serializer>(
+        time: &NaiveDateTime,
+        serializer: S,
+    ) -> Result<S::Ok, S::Error> {
+        time_to_json(time.clone()).serialize(serializer)
+    }
 
-    pub fn deserialize<'de, D: Deserializer<'de>>(deserializer: D) -> Result<NaiveDateTime, D::Error> {
-		let time: String = Deserialize::deserialize(deserializer)?;
-		Ok(DateTime::parse_from_rfc3339(&time).map_err(D::Error::custom)?.naive_utc())
-	}
+    pub fn deserialize<'de, D: Deserializer<'de>>(
+        deserializer: D,
+    ) -> Result<NaiveDateTime, D::Error> {
+        let time: String = Deserialize::deserialize(deserializer)?;
+        Ok(DateTime::parse_from_rfc3339(&time)
+            .map_err(D::Error::custom)?
+            .naive_utc())
+    }
 }

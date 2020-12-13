@@ -1,16 +1,16 @@
 #[path = "../Models/task.rs"]
 mod task;
 
-use crate::db_schema::tasks;
-use diesel::prelude::*;
 use crate::auth::*;
+use crate::db_schema::tasks;
 use crate::misc::*;
 use crate::DbConn;
+use chrono::{NaiveDateTime, Utc};
+use diesel::prelude::*;
 use rocket::http::Status;
 use rocket_contrib::json::Json;
 use task::{PostTask, Task};
 use uuid::Uuid;
-use chrono::{NaiveDateTime, Utc};
 
 /*
     Route:      /api/tasks
@@ -95,22 +95,23 @@ pub fn get_task_date(
         ))
         .filter(tasks::owner_id.eq(user_id.uuid))
         .into_boxed();
-    
+
     // Set the default start datetime to a very early arbitrary date
     // Set the default end datetime to right now
-    let mut start: NaiveDateTime = NaiveDateTime::parse_from_str("2000-01-01T00:00:00", "%Y-%m-%dT%H:%M:%S").unwrap();
+    let mut start: NaiveDateTime =
+        NaiveDateTime::parse_from_str("2000-01-01T00:00:00", "%Y-%m-%dT%H:%M:%S").unwrap();
     let mut end: NaiveDateTime = Utc::now().naive_utc();
-    
+
     // If a start_date exists, set the start variable to it
     // Otherwise, invalidate the first of the valid_dates tuple
     match start_date {
         Some(start_date) => {
             match start_date {
                 Ok(start_date) => start = *start_date,
-                Err(_) => malformed = true // Date must be malformed if resulting in Err
+                Err(_) => malformed = true, // Date must be malformed if resulting in Err
             }
-        },
-        None => valid_dates.0 = false
+        }
+        None => valid_dates.0 = false,
     };
 
     // If an end_start exists, set the end variable to it
@@ -119,10 +120,10 @@ pub fn get_task_date(
         Some(end_date) => {
             match end_date {
                 Ok(end_date) => end = *end_date,
-                Err(_) => malformed = true // Date must be malformed if resulting in Err
+                Err(_) => malformed = true, // Date must be malformed if resulting in Err
             }
-        },
-        None => valid_dates.1 = false
+        }
+        None => valid_dates.1 = false,
     };
 
     // If neither of the dates exists, return an error
@@ -132,8 +133,8 @@ pub fn get_task_date(
                 "error"     : "true",
                 "message"   : "Missing start_date OR end_date, or dates are not in \'YYYY-MM-DDTHH:mm:ss\' format."
             }),
-            status: Status::BadRequest
-        }
+            status: Status::BadRequest,
+        };
     }
 
     // Get all tasks between start and end date
@@ -145,9 +146,7 @@ pub fn get_task_date(
 
     return match task_arr {
         Ok(task_arr) => ApiResponse {
-            json: json!({
-                "tasks" : task_arr
-            }),
+            json: json!({ "tasks": task_arr }),
             status: Status::Ok,
         },
         Err(_) => ApiResponse {
@@ -155,9 +154,8 @@ pub fn get_task_date(
                 "error" : "true", 
                 "message" : "Could not fetch tasks!"}),
             status: Status::BadRequest,
-        }
-    }
-
+        },
+    };
 }
 
 /*
@@ -167,32 +165,35 @@ pub fn get_task_date(
     Authorized: True
 */
 #[get("/<user_id>/<task_id>")]
-pub fn get_task(conn: DbConn, _authed: Auth, user_id: UuidParam, task_id: UuidParam) -> ApiResponse {
+pub fn get_task(
+    conn: DbConn,
+    _authed: Auth,
+    user_id: UuidParam,
+    task_id: UuidParam,
+) -> ApiResponse {
     let task_query = tasks::table
-    .select((
-        tasks::id,
-        tasks::owner_id,
-        tasks::duration,
-        tasks::start,
-        tasks::label,
-    ))
-    .filter(tasks::owner_id.eq(user_id.uuid))
-    .filter(tasks::id.eq(task_id.uuid))
-    .first::<Task>(&*conn);
+        .select((
+            tasks::id,
+            tasks::owner_id,
+            tasks::duration,
+            tasks::start,
+            tasks::label,
+        ))
+        .filter(tasks::owner_id.eq(user_id.uuid))
+        .filter(tasks::id.eq(task_id.uuid))
+        .first::<Task>(&*conn);
 
     match task_query {
         Ok(task_query) => ApiResponse {
-            json: json!({
-                "task" : task_query
-            }),
-            status: Status::Ok
+            json: json!({ "task": task_query }),
+            status: Status::Ok,
         },
         Err(_) => ApiResponse {
             json: json!({
                 "error"     : "true",
                 "message"   : "Could not fetch task."
             }),
-            status: Status::Ok
+            status: Status::Ok,
         },
     }
 }

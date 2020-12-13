@@ -1,39 +1,64 @@
 #![feature(proc_macro_hygiene, decl_macro)]
 
-#[macro_use] extern crate diesel;
-#[macro_use] extern crate rocket;
-#[macro_use] extern crate rocket_contrib;
-#[macro_use] extern crate serde_derive;
+#[macro_use]
+extern crate diesel;
+#[macro_use]
+extern crate rocket;
+#[macro_use]
+extern crate rocket_contrib;
+#[macro_use]
+extern crate serde_derive;
+extern crate dotenv;
+extern crate redis;
 extern crate serde;
 extern crate serde_json;
-extern crate redis;
-extern crate dotenv;
-use dotenv::dotenv;
 #[macro_use]
 extern crate dotenv_codegen;
 
-use diesel::PgConnection;
-use diesel::r2d2::{ConnectionManager, Pool, PooledConnection};
+use dotenv::dotenv;
 
-use std::ops::Deref;
-use rocket::http::{Status, Method};
+use diesel::r2d2::{ConnectionManager, Pool, PooledConnection};
+use diesel::PgConnection;
+
+use rocket::http::{Method, Status};
 use rocket::request::{self, FromRequest};
-use rocket::{Request, State, Outcome};
+use rocket::{Outcome, Request, State};
+use std::ops::Deref;
 
 use rocket_cors::{
-    AllowedHeaders, AllowedOrigins, Error, // 2.
-    Cors, CorsOptions // 3.
+    AllowedHeaders,
+    AllowedOrigins, // 2.
+    Cors,
+    CorsOptions, // 3.
 };
+
+// If we are running dev mode or not
+pub static IS_DEV: &'static str = dotenv!("DEV");
 
 // An alias to the type for a pool of Diesel Pg connections.
 type PgPool = Pool<ConnectionManager<PgConnection>>;
 
-// The URL to the database, set via the `DATABASE_URL` environment variable.
-static DATABASE_URL: &'static str = dotenv!("DATABASE_URL");
-
 /// Initializes a database pool.
 fn init_pool() -> PgPool {
-    let manager = ConnectionManager::<PgConnection>::new(DATABASE_URL);
+    // The URL to the database, set via the `DATABASE_URL` environment variable.
+    let db_url = match IS_DEV {
+        "1" => format!(
+            "postgres://{}:{}@{}/{}",
+            dotenv!("POSTGRES_USER_DEV"),
+            dotenv!("POSTGRES_PASSWORD_DEV"),
+            dotenv!("DATABASE_IP"),
+            dotenv!("POSTGRES_DB_DEV")
+        ),
+        _ => format!(
+            "postgres://{}:{}@{}/{}",
+            dotenv!("POSTGRES_USER_PROD"),
+            dotenv!("POSTGRES_PASSWORD_PROD"),
+            dotenv!("DATABASE_IP"),
+            dotenv!("POSTGRES_DB_PROD")
+        ),
+    };
+
+    let manager = ConnectionManager::<PgConnection>::new(db_url);
     Pool::new(manager).expect("db pool")
 }
 
@@ -50,7 +75,7 @@ impl<'a, 'r> FromRequest<'a, 'r> for DbConn {
         let pool = request.guard::<State<PgPool>>()?;
         match pool.get() {
             Ok(conn) => Outcome::Success(DbConn(conn)),
-            Err(_) => Outcome::Failure((Status::ServiceUnavailable, ()))
+            Err(_) => Outcome::Failure((Status::ServiceUnavailable, ())),
         }
     }
 }
@@ -64,20 +89,20 @@ impl Deref for DbConn {
     }
 }
 
+#[path = "./Routes/api_tasks.rs"]
+mod api_tasks;
+#[path = "./Routes/api_users.rs"]
+mod api_users;
+#[path = "Helpers/auth.rs"]
+mod auth;
 mod db_schema;
 #[path = "./Helpers/misc.rs"]
 mod misc;
-#[path = "Helpers/auth.rs"]
-mod auth;
 #[path = "Helpers/redis_helpers.rs"]
 mod redis_helpers;
-#[path = "./Routes/api_users.rs"]
-mod api_users;
-#[path = "./Routes/api_tasks.rs"]
-mod api_tasks;
 
-use api_users::*;
 use api_tasks::*;
+use api_users::*;
 
 fn make_cors() -> Cors {
     let allowed_origins = AllowedOrigins::some_exact(&[
@@ -86,20 +111,24 @@ fn make_cors() -> Cors {
         "http://localhost:8000",
         "https://localhost:8000",
         "http://localhost:80",
-        "https://localhost:443", 
+        "https://localhost:443",
         "http://clockinout.net",
         "https://clockinout.net",
     ]);
 
-    CorsOptions { // 5.
+    CorsOptions {
+        // 5.
         allowed_origins,
         allowed_methods: vec![
-            Method::Get, 
-            Method::Post, 
-            Method::Put, 
+            Method::Get,
+            Method::Post,
+            Method::Put,
             Method::Delete,
             Method::Options,
-            ].into_iter().map(From::from).collect(), // 1.
+        ]
+        .into_iter()
+        .map(From::from)
+        .collect(), // 1.
         allowed_headers: AllowedHeaders::some(&[
             "Authorization",
             "Accept",
@@ -107,7 +136,7 @@ fn make_cors() -> Cors {
             "Content-Type",
             "DNT",
             "Referer",
-            "User-Agent"
+            "User-Agent",
         ]),
         allow_credentials: true,
         ..Default::default()
