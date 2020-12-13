@@ -7,6 +7,8 @@ services:
             - ./frontend:/usr/src/app
         ports:
             - "3000:3000"
+        environment:
+            - DEV=1
         command: bash -c "yarn && yarn start"
         links:
             - api

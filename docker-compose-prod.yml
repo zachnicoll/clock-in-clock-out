@@ -5,6 +5,8 @@ services:
         build:
             context: ./frontend
             dockerfile: Dockerfile-prod
+        environment: 
+            - DEV=0
         volumes:
             - ./frontend:/usr/src/app
         ports:

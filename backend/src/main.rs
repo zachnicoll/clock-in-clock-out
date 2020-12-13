@@ -27,9 +27,9 @@ use std::ops::Deref;
 
 use rocket_cors::{
     AllowedHeaders,
-    AllowedOrigins, // 2.
+    AllowedOrigins,
     Cors,
-    CorsOptions, // 3.
+    CorsOptions,
 };
 
 // If we are running dev mode or not
@@ -40,7 +40,8 @@ type PgPool = Pool<ConnectionManager<PgConnection>>;
 
 /// Initializes a database pool.
 fn init_pool() -> PgPool {
-    // The URL to the database, set via the `DATABASE_URL` environment variable.
+    println!("Currently running with IS_DEV: {}", IS_DEV);
+
     let db_url = match IS_DEV {
         "1" => format!(
             "postgres://{}:{}@{}/{}",
