@@ -6,6 +6,8 @@ COPY . /usr/src/app
 
 WORKDIR /usr/src/app
 
+RUN cargo clean
+
 RUN cargo build --release
 
 RUN mkdir /backend

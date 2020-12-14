@@ -40,8 +40,6 @@ type PgPool = Pool<ConnectionManager<PgConnection>>;
 
 /// Initializes a database pool.
 fn init_pool() -> PgPool {
-    println!("Currently running with IS_DEV: {}", IS_DEV);
-
     let db_url = match IS_DEV {
         "1" => format!(
             "postgres://{}:{}@{}/{}",
