@@ -1,7 +1,5 @@
 # Clock In/Clock Out
 
-http://clockinout.net
-
 ## Description
  An application targetted at business owners, team leads, project mangers and corporations that operate via a ticketing systems, like Jira, and need to keep track of their employee's tasks throughout the day. This tool is useful for centralising time tracking on tickets and gaining statistics on employees like utilisation and averages in certain categories of work.
 
